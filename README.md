@@ -4,6 +4,10 @@ This is a CLI tool that starts a server that wraps an OpenAI-compatible API and 
 which is useful for providing custom models for coding agents that don't support custom OpenAI APIs but do support Ollama
 (like GitHub Copilot for VS Code).
 
+OpenAI-format requests automatically add `cache_control: {"type": "ephemeral"}` to message content
+blocks and tool definitions that do not already define one. `/v1/responses` also adds
+`instructions_cache_control: {"type": "ephemeral"}` when `instructions` is present.
+
 ## Usage
 
 ### with Python
