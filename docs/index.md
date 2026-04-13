@@ -18,13 +18,14 @@ uvx oai2ollama --help
 ```
 
 ```text
-usage: oai2ollama [--api-key str] [--base-url HttpUrl] [--capabilities list[str]] [--models list[str]] [--host str]
+usage: oai2ollama [--api-key str] [--base-url HttpUrl] [--capabilities list[str]] [--models list[str]] [--model-alias list[str]] [--host str]
 options:
   --help, -h                    Show this help message and exit
   --api-key str                 API key for authentication (required)
   --base-url HttpUrl            Base URL for the OpenAI-compatible API (required)
   --capabilities, -c list[str]  Extra capabilities to mark the model as supporting
   --models, -m list[str]        Extra models to include in the /api/tags response
+  --model-alias, -a list[str]   Model alias in alias=target form
   --host str                    IP / hostname for the API server (default: localhost)
 ```
 
@@ -36,6 +37,7 @@ OPENAI_BASE_URL=your_base_url
 HOST=0.0.0.0
 CAPABILITIES=["vision","thinking"]
 MODELS=["custom-model1","custom-model2"]
+MODEL_ALIAS=["sonnet=anthropic/claude-3-5-sonnet"]
 ```
 
 !!! tip ""
@@ -49,6 +51,10 @@ MODELS=["custom-model1","custom-model2"]
     To support models that are not returned by the `/models` endpoint:
 
     `oai2ollama -m model1 -m model2` or `oai2ollama -m model1,model2`
+
+    To expose a shorter local model name that forwards to a different upstream model:
+
+    `oai2ollama -a sonnet=anthropic/claude-3-5-sonnet`
 
     Capabilities currently used by Ollama are: `tools`, `insert`, `vision`, `embedding`, `thinking` and `completion`. We always include `completion`.
 
@@ -74,4 +80,5 @@ docker run -p 11434:11434 oai2ollama --host "::"
 - Ollama-compatible `/api/tags` and `/api/show` endpoints
 - Streaming response support
 - Configurable model list with extra models
+- Model aliasing for request rewriting and discovery
 - Customizable capabilities (tools, insert, vision, embedding, thinking)

@@ -2,7 +2,7 @@ from os import getenv
 from sys import stderr
 from typing import Literal, Self
 
-from pydantic import Field, HttpUrl, ValidationError, model_validator
+from pydantic import Field, HttpUrl, ValidationError, field_validator, model_validator
 from pydantic_settings import BaseSettings, CliSuppress
 
 
@@ -15,6 +15,7 @@ class Settings(BaseSettings):
         "cli_shortcuts": {
             "capabilities": "c",
             "models": "m",
+            "model_alias": "a",
         },
     }
 
@@ -24,6 +25,28 @@ class Settings(BaseSettings):
     capabilities: list[Literal["tools", "insert", "vision", "embedding", "thinking"]] = []
     host: str = Field("localhost", description="IP / hostname for the API server")
     extra_models: list[str] = Field([], description="Extra models to include in the /api/tags response", alias="models")
+    model_aliases: list[str] = Field([], description="Model aliases in alias=target form", alias="model_alias")
+
+    @field_validator("model_aliases")
+    @classmethod
+    def _validate_model_aliases(cls, value: list[str]):
+        aliases: set[str] = set()
+
+        for item in value:
+            alias, separator, target = item.partition("=")
+            if not separator or not alias or not target:
+                raise ValueError("must use alias=target format")
+            if alias == target:
+                raise ValueError("must map to a different target model")
+            if alias in aliases:
+                raise ValueError(f"duplicate alias: {alias}")
+            aliases.add(alias)
+
+        return value
+
+    @property
+    def model_alias_map(self):
+        return {alias: target for alias, _, target in (item.partition("=") for item in self.model_aliases)}
 
     @model_validator(mode="after")
     def _warn_legacy_capacities(self: Self):
