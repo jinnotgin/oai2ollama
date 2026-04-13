@@ -18,7 +18,7 @@ uvx oai2ollama --help
 ```
 
 ```text
-usage: oai2ollama [--api-key str] [--base-url HttpUrl] [--capabilities list[str]] [--models list[str]] [--model-alias list[str]] [--host str]
+usage: oai2ollama [--api-key str] [--base-url HttpUrl] [--capabilities list[str]] [--models list[str]] [--model-alias list[str]] [--host str] [--auto-claude-prompt-caching bool]
 options:
   --help, -h                    Show this help message and exit
   --api-key str                 API key for authentication (required)
@@ -27,6 +27,8 @@ options:
   --models, -m list[str]        Extra models to include in the /api/tags response
   --model-alias, -a list[str]   Model alias in alias=target form
   --host str                    IP / hostname for the API server (default: localhost)
+  --auto-claude-prompt-caching bool
+                                Enable automatic prompt caching for Claude models (default: False)
 ```
 
 Or you can use a `.env` file:
@@ -36,6 +38,7 @@ OPENAI_API_KEY=your_api_key
 OPENAI_BASE_URL=your_base_url
 HOST=0.0.0.0
 CAPABILITIES=["vision","thinking"]
+AUTO_CLAUDE_PROMPT_CACHING=true
 MODELS=["custom-model1","custom-model2"]
 MODEL_ALIAS=["sonnet=anthropic/claude-3-5-sonnet"]
 ```
@@ -55,6 +58,10 @@ MODEL_ALIAS=["sonnet=anthropic/claude-3-5-sonnet"]
     To expose a shorter local model name that forwards to a different upstream model:
 
     `oai2ollama -a sonnet=anthropic/claude-3-5-sonnet`
+
+    To enable automatic prompt caching for Claude models after alias resolution:
+
+    `oai2ollama --auto-claude-prompt-caching true`
 
     Capabilities currently used by Ollama are: `tools`, `insert`, `vision`, `embedding`, `thinking` and `completion`. We always include `completion`.
 

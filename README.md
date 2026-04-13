@@ -4,9 +4,9 @@ This is a CLI tool that starts a server that wraps an OpenAI-compatible API and 
 which is useful for providing custom models for coding agents that don't support custom OpenAI APIs but do support Ollama
 (like GitHub Copilot for VS Code).
 
-OpenAI-format requests automatically add `cache_control: {"type": "ephemeral"}` to message content
-blocks and tool definitions that do not already define one. `/v1/responses` also adds
-`instructions_cache_control: {"type": "ephemeral"}` when `instructions` is present.
+When `--auto-claude-prompt-caching` is enabled, OpenAI-format requests whose resolved upstream model
+ID contains `claude` automatically add prompt caching directives where supported. Existing
+caller-provided cache settings are preserved.
 
 ## Usage
 
@@ -19,7 +19,7 @@ uvx oai2ollama --help
 ```
 
 ```text
-usage: oai2ollama [--api-key str] [--base-url HttpUrl] [--capabilities list[str]] [--models list[str]] [--model-alias list[str]] [--host str]
+usage: oai2ollama [--api-key str] [--base-url HttpUrl] [--capabilities list[str]] [--models list[str]] [--model-alias list[str]] [--host str] [--auto-claude-prompt-caching bool]
 options:
   --help, -h                    Show this help message and exit
   --api-key str                 API key for authentication (required)
@@ -28,6 +28,8 @@ options:
   --models, -m list[str]        Extra models to include in the /api/tags response
   --model-alias, -a list[str]   Model alias in alias=target form
   --host str                    IP / hostname for the API server (default: localhost)
+  --auto-claude-prompt-caching bool
+                                Enable automatic prompt caching for Claude models (default: False)
 ```
 
 > [!TIP]
@@ -47,6 +49,10 @@ options:
 >
 > `oai2ollama -a sonnet=anthropic/claude-3-5-sonnet -a opus=anthropic/claude-opus-4-1`
 >
+> To enable automatic prompt caching for Claude models after alias resolution:
+>
+> `oai2ollama --auto-claude-prompt-caching true`
+>
 > Capabilities currently [used by Ollama](https://github.com/ollama/ollama/blob/main/types/model/capability.go#L6-L11) are:
 > `tools`, `insert`, `vision`, `embedding`, `thinking` and `completion`. We always include `completion`.
 
@@ -57,6 +63,7 @@ OPENAI_API_KEY=your_api_key
 OPENAI_BASE_URL=your_base_url
 HOST=0.0.0.0
 CAPABILITIES=["vision","thinking"]
+AUTO_CLAUDE_PROMPT_CACHING=true
 MODELS=["custom-model1","custom-model2"]
 MODEL_ALIAS=["sonnet=anthropic/claude-3-5-sonnet","opus=anthropic/claude-opus-4-1"]
 ```

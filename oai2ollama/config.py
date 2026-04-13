@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     capacities: CliSuppress[list[Literal["tools", "insert", "vision", "embedding", "thinking"]]] = Field([], repr=False)
     capabilities: list[Literal["tools", "insert", "vision", "embedding", "thinking"]] = []
     host: str = Field("localhost", description="IP / hostname for the API server")
+    auto_claude_prompt_caching: bool = Field(False, description="Enable automatic prompt caching for Claude models")
     extra_models: list[str] = Field([], description="Extra models to include in the /api/tags response", alias="models")
     model_aliases: list[str] = Field([], description="Model aliases in alias=target form", alias="model_alias")
 
