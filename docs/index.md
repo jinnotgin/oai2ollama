@@ -21,7 +21,7 @@ uvx oai2ollama --help
 usage: oai2ollama [--api-key str] [--base-url HttpUrl] [--capabilities list[str]] [--models list[str]] [--model-alias list[str]] [--host str] [--auto-claude-prompt-caching bool]
 options:
   --help, -h                    Show this help message and exit
-  --api-key str                 API key for authentication (required)
+  --api-key str                 Optional upstream API key for authentication
   --base-url HttpUrl            Base URL for the OpenAI-compatible API (required)
   --capabilities, -c list[str]  Extra capabilities to mark the model as supporting
   --models, -m list[str]        Extra models to include in the /api/tags response
@@ -34,7 +34,6 @@ options:
 Or you can use a `.env` file:
 
 ```properties
-OPENAI_API_KEY=your_api_key
 OPENAI_BASE_URL=your_base_url
 HOST=0.0.0.0
 CAPABILITIES=["vision","thinking"]
@@ -62,6 +61,8 @@ MODEL_ALIAS=["sonnet=anthropic/claude-3-5-sonnet"]
     To enable automatic prompt caching for Claude models after alias resolution:
 
     `oai2ollama --auto-claude-prompt-caching true`
+
+    If `OPENAI_API_KEY` is omitted, incoming `Authorization`, `api-key`, and `x-api-key` headers are forwarded upstream.
 
     Capabilities currently used by Ollama are: `tools`, `insert`, `vision`, `embedding`, `thinking` and `completion`. We always include `completion`.
 

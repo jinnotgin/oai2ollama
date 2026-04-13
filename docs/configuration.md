@@ -8,7 +8,7 @@ icon: lucide/cog
 
 | Variable          | CLI Flag               | Description                                        | Default     |
 | ----------------- | ---------------------- | -------------------------------------------------- | ----------- |
-| `OPENAI_API_KEY`  | `--api-key`            | API key for authentication                         | _required_  |
+| `OPENAI_API_KEY`  | `--api-key`            | Optional upstream API key for authentication       | unset       |
 | `OPENAI_BASE_URL` | `--base-url`           | Base URL for OpenAI-compatible API                 | _required_  |
 | `HOST`            | `--host`               | IP/hostname for the API server                     | `localhost` |
 | `CAPABILITIES`    | `--capabilities`, `-c` | Extra capabilities to mark the model as supporting | `[]`        |
@@ -79,10 +79,19 @@ oai2ollama --auto-claude-prompt-caching true
 
 This is disabled by default. When enabled, existing caller-provided cache directives are preserved.
 
+## Upstream Authentication
+
+If `OPENAI_API_KEY` or `--api-key` is set, the proxy always uses that key for upstream requests.
+
+If it is omitted, the proxy forwards these incoming request headers to the upstream API when present:
+
+- `Authorization`
+- `api-key`
+- `x-api-key`
+
 ## Example .env File
 
 ```properties
-OPENAI_API_KEY=your_api_key
 OPENAI_BASE_URL=https://api.openai.com/v1
 HOST=0.0.0.0
 CAPABILITIES=["vision","thinking"]
@@ -111,4 +120,12 @@ docker run -p 11434:11434 \
   --capabilities tools,vision --models custom-model \
   --auto-claude-prompt-caching true \
   --model-alias sonnet=anthropic/claude-3-5-sonnet
+```
+
+To rely on forwarded request auth instead:
+
+```sh
+docker run -p 11434:11434 \
+  -e OPENAI_BASE_URL="your_base_url" \
+  oai2ollama
 ```

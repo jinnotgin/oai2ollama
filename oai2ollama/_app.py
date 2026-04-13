@@ -6,6 +6,17 @@ from .config import env
 app = FastAPI()
 
 
+def _upstream_headers(request: Request):
+    if env.api_key:
+        return {"Authorization": f"Bearer {env.api_key}"}
+
+    headers = {}
+    for source, target in (("authorization", "Authorization"), ("api-key", "api-key"), ("x-api-key", "x-api-key")):
+        if value := request.headers.get(source):
+            headers[target] = value
+    return headers
+
+
 def _resolve_model_alias(model: object):
     if isinstance(model, str):
         return env.model_alias_map.get(model, model)
@@ -77,10 +88,10 @@ def _prepare_responses_payload(data: dict):
 
 
 @Depends
-async def _new_client():
+async def _new_client(request: Request):
     from httpx import AsyncClient
 
-    async with AsyncClient(base_url=str(env.base_url), headers={"Authorization": f"Bearer {env.api_key}"}, timeout=60, http2=True, follow_redirects=True) as client:
+    async with AsyncClient(base_url=str(env.base_url), headers=_upstream_headers(request), timeout=60, http2=True, follow_redirects=True) as client:
         yield client
 
 
