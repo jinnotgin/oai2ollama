@@ -22,7 +22,7 @@ usage: oai2ollama [--api-key str] [--base-url HttpUrl] [--capabilities list[str]
 options:
   --help, -h                    Show this help message and exit
   --api-key str                 Optional upstream API key for authentication
-  --base-url HttpUrl            Base URL for the OpenAI-compatible API (required)
+  --base-url HttpUrl            Base URL for the OpenAI-compatible API root, without /v1 (required)
   --capabilities, -c list[str]  Extra capabilities to mark the model as supporting
   --models, -m list[str]        Extra models to include in the /api/tags response
   --model-alias, -a list[str]   Model alias in alias=target form
@@ -34,7 +34,7 @@ options:
 Or you can use a `.env` file:
 
 ```properties
-OPENAI_BASE_URL=your_base_url
+OPENAI_BASE_URL=https://api.openai.com
 HOST=0.0.0.0
 CAPABILITIES=["vision","thinking"]
 AUTO_CLAUDE_PROMPT_CACHING=true
@@ -62,6 +62,8 @@ MODEL_ALIAS=["sonnet=anthropic/claude-3-5-sonnet"]
 
     `oai2ollama --auto-claude-prompt-caching true`
 
+    Set `OPENAI_BASE_URL` to the API root without `/v1`, for example `https://api.openai.com`.
+
     If `OPENAI_API_KEY` is omitted, incoming `Authorization`, `api-key`, and `x-api-key` headers are forwarded upstream.
 
     Capabilities currently used by Ollama are: `tools`, `insert`, `vision`, `embedding`, `thinking` and `completion`. We always include `completion`.
@@ -72,7 +74,7 @@ MODEL_ALIAS=["sonnet=anthropic/claude-3-5-sonnet"]
 docker build -t oai2ollama .
 docker run -p 11434:11434 \
   -e OPENAI_API_KEY="your_api_key" \
-  -e OPENAI_BASE_URL="your_base_url" \
+  -e OPENAI_BASE_URL="https://api.openai.com" \
   oai2ollama
 ```
 

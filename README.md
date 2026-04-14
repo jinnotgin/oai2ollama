@@ -23,7 +23,7 @@ usage: oai2ollama [--api-key str] [--base-url HttpUrl] [--capabilities list[str]
 options:
   --help, -h                    Show this help message and exit
   --api-key str                 Optional upstream API key for authentication
-  --base-url HttpUrl            Base URL for the OpenAI-compatible API (required)
+  --base-url HttpUrl            Base URL for the OpenAI-compatible API root, without /v1 (required)
   --capabilities, -c list[str]  Extra capabilities to mark the model as supporting
   --models, -m list[str]        Extra models to include in the /api/tags response
   --model-alias, -a list[str]   Model alias in alias=target form
@@ -56,6 +56,8 @@ options:
 > Capabilities currently [used by Ollama](https://github.com/ollama/ollama/blob/main/types/model/capability.go#L6-L11) are:
 > `tools`, `insert`, `vision`, `embedding`, `thinking` and `completion`. We always include `completion`.
 >
+> Set `OPENAI_BASE_URL` / `--base-url` to the API root without `/v1`, for example `https://api.openai.com`.
+>
 > If `OPENAI_API_KEY` / `--api-key` is omitted, the proxy forwards incoming `Authorization`, `api-key`, or `x-api-key` headers to the upstream API instead.
 
 ## What It Does
@@ -68,7 +70,7 @@ options:
 Or you can use a `.env` file to set these options:
 
 ```properties
-OPENAI_BASE_URL=your_base_url
+OPENAI_BASE_URL=https://api.openai.com
 HOST=0.0.0.0
 CAPABILITIES=["vision","thinking"]
 AUTO_CLAUDE_PROMPT_CACHING=true
@@ -92,7 +94,7 @@ Then, run the container with your credentials:
 ```sh
 docker run -p 11434:11434 \
   -e OPENAI_API_KEY="your_api_key" \
-  -e OPENAI_BASE_URL="your_base_url" \
+  -e OPENAI_BASE_URL="https://api.openai.com" \
   oai2ollama
 ```
 
@@ -100,14 +102,14 @@ Or omit `OPENAI_API_KEY` and let the proxy forward auth headers from each incomi
 
 ```sh
 docker run -p 11434:11434 \
-  -e OPENAI_BASE_URL="your_base_url" \
+  -e OPENAI_BASE_URL="https://api.openai.com" \
   oai2ollama
 ```
 
 Or you can pass these as command line arguments:
 
 ```sh
-docker run -p 11434:11434 oai2ollama --api-key your_api_key --base-url your_base_url
+docker run -p 11434:11434 oai2ollama --api-key your_api_key --base-url https://api.openai.com
 ```
 
 To have the server listen on a different host, like all IPv6 interfaces, use the `--host` argument:

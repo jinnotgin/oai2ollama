@@ -91,13 +91,14 @@ def _prepare_responses_payload(data: dict):
 async def _new_client(request: Request):
     from httpx import AsyncClient
 
-    async with AsyncClient(base_url=str(env.base_url), headers=_upstream_headers(request), timeout=60, http2=True, follow_redirects=True) as client:
+    base_url = f"{str(env.base_url).rstrip('/')}/"
+    async with AsyncClient(base_url=base_url, headers=_upstream_headers(request), timeout=60, http2=True, follow_redirects=True) as client:
         yield client
 
 
 @app.get("/api/tags")
 async def models(client=_new_client):
-    res = await client.get("/models")
+    res = await client.get("v1/models")
     res.raise_for_status()
     try:
         data = res.json()["data"]
@@ -117,7 +118,7 @@ async def show_model():
 
 @app.get("/v1/models")
 async def list_models(client=_new_client):
-    res = await client.get("/models")
+    res = await client.get("v1/models")
     res.raise_for_status()
     data = res.json()
 
@@ -145,14 +146,14 @@ async def chat_completions(request: Request, client=_new_client):
     if data.get("stream", False):
 
         async def stream():
-            async with client.stream("POST", "/chat/completions", json=data) as response:
+            async with client.stream("POST", "v1/chat/completions", json=data) as response:
                 async for chunk in response.aiter_bytes():
                     yield chunk
 
         return StreamingResponse(stream(), media_type="text/event-stream")
 
     else:
-        res = await client.post("/chat/completions", json=data)
+        res = await client.post("v1/chat/completions", json=data)
         res.raise_for_status()
         return res.json()
 
@@ -164,14 +165,14 @@ async def responses(request: Request, client=_new_client):
     if data.get("stream", False):
 
         async def stream():
-            async with client.stream("POST", "/responses", json=data) as response:
+            async with client.stream("POST", "v1/responses", json=data) as response:
                 async for chunk in response.aiter_bytes():
                     yield chunk
 
         return StreamingResponse(stream(), media_type="text/event-stream")
 
     else:
-        res = await client.post("/responses", json=data)
+        res = await client.post("v1/responses", json=data)
         res.raise_for_status()
         return res.json()
 

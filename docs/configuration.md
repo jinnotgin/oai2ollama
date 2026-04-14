@@ -9,7 +9,7 @@ icon: lucide/cog
 | Variable          | CLI Flag               | Description                                        | Default     |
 | ----------------- | ---------------------- | -------------------------------------------------- | ----------- |
 | `OPENAI_API_KEY`  | `--api-key`            | Optional upstream API key for authentication       | unset       |
-| `OPENAI_BASE_URL` | `--base-url`           | Base URL for OpenAI-compatible API                 | _required_  |
+| `OPENAI_BASE_URL` | `--base-url`           | Base URL for OpenAI-compatible API root, without `/v1` | _required_  |
 | `HOST`            | `--host`               | IP/hostname for the API server                     | `localhost` |
 | `CAPABILITIES`    | `--capabilities`, `-c` | Extra capabilities to mark the model as supporting | `[]`        |
 | `AUTO_CLAUDE_PROMPT_CACHING` | `--auto-claude-prompt-caching` | Enable automatic prompt caching for Claude models | `false` |
@@ -92,7 +92,7 @@ If it is omitted, the proxy forwards these incoming request headers to the upstr
 ## Example .env File
 
 ```properties
-OPENAI_BASE_URL=https://api.openai.com/v1
+OPENAI_BASE_URL=https://api.openai.com
 HOST=0.0.0.0
 CAPABILITIES=["vision","thinking"]
 AUTO_CLAUDE_PROMPT_CACHING=true
@@ -105,7 +105,7 @@ MODEL_ALIAS=["sonnet=anthropic/claude-3-5-sonnet","opus=anthropic/claude-opus-4-
 ```sh
 docker run -p 11434:11434 \
   -e OPENAI_API_KEY="your_api_key" \
-  -e OPENAI_BASE_URL="your_base_url" \
+  -e OPENAI_BASE_URL="https://api.openai.com" \
   -e CAPABILITIES='["vision","thinking"]' \
   -e AUTO_CLAUDE_PROMPT_CACHING=true \
   -e MODEL_ALIAS='["sonnet=anthropic/claude-3-5-sonnet"]' \
@@ -116,7 +116,7 @@ Or with CLI arguments:
 
 ```sh
 docker run -p 11434:11434 \
-  oai2ollama --api-key your_api_key --base-url your_base_url \
+  oai2ollama --api-key your_api_key --base-url https://api.openai.com \
   --capabilities tools,vision --models custom-model \
   --auto-claude-prompt-caching true \
   --model-alias sonnet=anthropic/claude-3-5-sonnet
@@ -126,6 +126,6 @@ To rely on forwarded request auth instead:
 
 ```sh
 docker run -p 11434:11434 \
-  -e OPENAI_BASE_URL="your_base_url" \
+  -e OPENAI_BASE_URL="https://api.openai.com" \
   oai2ollama
 ```
