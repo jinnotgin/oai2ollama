@@ -9,4 +9,3 @@ COPY . .
 RUN uv sync --no-cache
 
 ENTRYPOINT ["uv", "run", "oai2ollama", "--host", "0.0.0.0"]
-CMD ["--help"]
